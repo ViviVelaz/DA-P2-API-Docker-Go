@@ -1,0 +1,28 @@
+version: '3.9' # Versión de docker
+
+#Definición de servicios
+services:
+  go-app:
+    container_name: go-app # Nombre del contenedor
+    image: viviana/go-app:1.0.0 # Imagen que se utilizará apra el servicio
+    build: . # Directorio para compilar la imagen
+    environment: # Variables de entorno que se pasan al contenedor
+      DATABASE_URL: "host=go_db user=viviana password=12345 dbname=ice_cream sslmode=disable"
+    ports: # Mapeo de puerto de host a puerto de contenedor
+      - "8080:8080"
+    depends_on: # Este servicio depende de otro
+      - go_db
+  go_db:
+    container_name: some-postgres
+    image: postgres:latest
+    environment:
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_USER: viviana
+      POSTGRES_DB: ice_cream
+    ports:
+      - "5432:5432"
+    volumes: # Persistencia de datos al detener o eliminar el contenedor
+      - pgdata:/var/lib/postgresql/data
+
+volumes: # Persiste los datos de la base de datos PostgreSQL en el servicio go_db
+  pgdata: {}
